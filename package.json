@@ -1,0 +1,23 @@
+{
+  "name": "todoapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idali0226/todoApp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/idali0226/todoApp/issues"
+  },
+  "homepage": "https://github.com/idali0226/todoApp#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "connect": "^3.6.6"
+  }
+}
