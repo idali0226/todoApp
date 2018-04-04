@@ -83,5 +83,15 @@ router
     }
     res.status(200).json(todoItem)
   })
+  .patch(jsonParser, (req, res) => {
+    const { status } = req.body
+    const todoItem = req.item
+    if (!todoItem) {
+      res.sendStatus(404)
+    } else {
+      todoItem.status = status
+    }
+    res.status(200).json(todoItem)
+  })
 
 module.exports = router
