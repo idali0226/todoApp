@@ -19,8 +19,11 @@ router
   })
   .post(jsonParser, (req, res) => {
     const { name, description, status } = req.body
-    const lastId = inMemoryTodos[inMemoryTodos.length - 1].id
-    const id = lastId + 1
+    let id = 0
+    if (inMemoryTodos.length > 0) {
+      id = inMemoryTodos[inMemoryTodos.length - 1].id + 1
+    }
+
     const newTodo = { id, name, description, status }
     inMemoryTodos.push(newTodo)
 
