@@ -2,8 +2,8 @@ const express = require('express')
 
 const app = express()
 
-app.get('/', (req, res) => {
-    res.send('Hello world')
-})
+const routes = require('./src/routes/todos')
 
-app.listen(3300)
+app.use('/todos', routes)
+
+app.listen(8000)
