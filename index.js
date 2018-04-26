@@ -1,6 +1,9 @@
 const express = require('express')
+const bodyParser = require('body-parser')
+const { User, Todo } = require('./src/sequelize')
 
 const app = express()
+app.use(bodyParser.json())
 
 const routes = require('./src/routes/todos')
 
