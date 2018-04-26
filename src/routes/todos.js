@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const { Todo } = require('../sequelize')
 
 const router = express.Router()
 const jsonParser = bodyParser.json()
@@ -15,22 +16,27 @@ const inMemoryTodos = [
 router
   .route('/')
   .get((req, res) => {
-    res.status(200).json(inMemoryTodos)
+    Todo.findAll().then(todos => res.json(todos))
+    //  res.status(200).json(inMemoryTodos)
   })
   .post(jsonParser, (req, res) => {
-    const { name, description, status } = req.body
-    let id = 0
-    if (inMemoryTodos.length > 0) {
-      id = inMemoryTodos[inMemoryTodos.length - 1].id + 1
-    }
+    const body = req.body
 
-    const newTodo = { id, name, description, status }
-    inMemoryTodos.push(newTodo)
+    //  const { name, description, status } = req.body
+    //  let id = 0
+    //  if (inMemoryTodos.length > 0) {
+    //    id = inMemoryTodos[inMemoryTodos.length - 1].id + 1
+    //  }
 
-    res
-      .status(201)
-      .location(`/todos/${id}`)
-      .json(newTodo)
+    //  const newTodo = { id, name, description, status }
+    //  inMemoryTodos.push(newTodo)
+
+    Todo.create(body).then(user => res.json(user))
+
+    //  res
+    //    .status(201)
+    //    .location(`/todos/${id}`)
+    //    .json(newTodo)
   })
 
 router.route('/search').get((req, res) => {
