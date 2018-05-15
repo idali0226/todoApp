@@ -1,66 +1,55 @@
+const Sequelize = require('sequelize')
 const express = require('express')
 const bodyParser = require('body-parser')
-const { Todo } = require('../sequelize')
+const { Todo, User } = require('../sequelize')
 
 const router = express.Router()
 const jsonParser = bodyParser.json()
-
-const inMemoryTodos = [
-  { id: 0, name: 'Task 1', description: 'Read a book', status: 'Done' },
-  { id: 1, name: 'Task 2', description: 'Watch a movie', status: 'Done' },
-  { id: 2, name: 'Task 3', description: 'Eat pizza', status: 'New' },
-  { id: 3, name: 'Task 4', description: 'Buy milk', status: 'New' },
-  { id: 4, name: 'Task 5', description: 'Hot yoga', status: 'New' },
-]
 
 router
   .route('/')
   .get((req, res) => {
     Todo.findAll().then(todos => res.json(todos))
-    //  res.status(200).json(inMemoryTodos)
   })
   .post(jsonParser, (req, res) => {
-    const body = req.body
-
-    //  const { name, description, status } = req.body
-    //  let id = 0
-    //  if (inMemoryTodos.length > 0) {
-    //    id = inMemoryTodos[inMemoryTodos.length - 1].id + 1
-    //  }
-
-    //  const newTodo = { id, name, description, status }
-    //  inMemoryTodos.push(newTodo)
-
-    Todo.create(body).then(user => res.json(user))
-
-    //  res
-    //    .status(201)
-    //    .location(`/todos/${id}`)
-    //    .json(newTodo)
+    Todo.create(req.body).then(todo => res.json(todo))
   })
 
 router.route('/search').get((req, res) => {
-  const { status } = req.query
-  if (status) {
-    res
-      .status(200)
-      .json(
-        inMemoryTodos.filter(
-          todo => todo.status.toLowerCase() === status.toLowerCase()
-        )
-      )
+  const { status, userId } = req.query
+
+  if (status && userId) {
+    query = Todo.findAll({
+      where: {
+        status: status,
+        userId: userId,
+      },
+    })
+  } else if (status) {
+    query = Todo.findAll({
+      where: {
+        status: status,
+      },
+    })
   } else {
-    res.status(200).json(inMemoryTodos)
+    query = Todo.findAll({
+      where: {
+        userId: userId,
+      },
+    })
   }
+
+  query.then(todos => res.json(todos))
 })
 
 router
   .route('/:id')
   .all((req, res, next) => {
     const { id } = req.params
-    const todoItem = inMemoryTodos.find(todo => `${todo.id}` === id)
-    req.item = todoItem
-    next()
+    Todo.findById(id).then(todoItem => {
+      req.item = todoItem
+      next()
+    })
   })
   .get((req, res) => {
     const todoItem = req.item
@@ -75,22 +64,32 @@ router
     if (!todoItem) {
       res.sendStatus(404)
     } else {
-      const index = inMemoryTodos.indexOf(todoItem)
-      inMemoryTodos.splice(index, 1)
+      todoItem.destroy()
       res.sendStatus(200)
     }
   })
   .put(jsonParser, (req, res) => {
+    console.log('update')
     const { name, description, status } = req.body
+
     const todoItem = req.item
     if (!todoItem) {
       res.sendStatus(404)
     } else {
-      todoItem.name = name
-      todoItem.description = description
-      todoItem.status = status
+      const newData = {
+        name: name,
+        description: description,
+        status: status,
+      }
+
+      todoItem
+        .update(newData, {
+          returning: true,
+        })
+        .then(updatedTodo => {
+          res.status(200).json(updatedTodo)
+        })
     }
-    res.status(200).json(todoItem)
   })
   .patch(jsonParser, (req, res) => {
     const { status } = req.body
@@ -98,9 +97,17 @@ router
     if (!todoItem) {
       res.sendStatus(404)
     } else {
-      todoItem.status = status
+      const updateObj = {
+        status: status,
+      }
+      todoItem
+        .updateAttributes(updateObj, {
+          returning: true,
+        })
+        .then(updatedTodo => {
+          res.status(200).json(updatedTodo)
+        })
     }
-    res.status(200).json(todoItem)
   })
 
 module.exports = router
