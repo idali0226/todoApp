@@ -18,14 +18,13 @@ router
     }).then(users => res.json(users))
   })
   .post(jsonParser, (req, res) => {
-    const body = req.body
-
-    User.create(body).then(user => res.json(user))
+    User.create(req.body).then(user => res.json(user))
   })
 
 router.route('/search').get((req, res) => {
   const { name } = req.query
 
+  let query
   if (name) {
     query = User.findAll({
       include: [
@@ -34,7 +33,7 @@ router.route('/search').get((req, res) => {
           as: 'todos',
         },
       ],
-      where: { name: name },
+      where: { name },
     })
 
     query.then(users => res.json(users))
@@ -51,7 +50,7 @@ router
     })
   })
   .get((req, res) => {
-    const user = req.user
+    const { user } = req.user
     if (!user) {
       res.sendStatus(404)
     } else {

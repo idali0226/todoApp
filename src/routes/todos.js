@@ -1,7 +1,6 @@
-const Sequelize = require('sequelize')
 const express = require('express')
 const bodyParser = require('body-parser')
-const { Todo, User } = require('../sequelize')
+const { Todo } = require('../sequelize')
 
 const router = express.Router()
 const jsonParser = bodyParser.json()
@@ -18,23 +17,24 @@ router
 router.route('/search').get((req, res) => {
   const { status, userId } = req.query
 
+  let query
   if (status && userId) {
     query = Todo.findAll({
       where: {
-        status: status,
-        userId: userId,
+        status,
+        userId,
       },
     })
   } else if (status) {
     query = Todo.findAll({
       where: {
-        status: status,
+        status,
       },
     })
   } else {
     query = Todo.findAll({
       where: {
-        userId: userId,
+        userId,
       },
     })
   }
@@ -69,7 +69,6 @@ router
     }
   })
   .put(jsonParser, (req, res) => {
-    console.log('update')
     const { name, description, status } = req.body
 
     const todoItem = req.item
@@ -77,9 +76,9 @@ router
       res.sendStatus(404)
     } else {
       const newData = {
-        name: name,
-        description: description,
-        status: status,
+        name,
+        description,
+        status,
       }
 
       todoItem
@@ -98,7 +97,7 @@ router
       res.sendStatus(404)
     } else {
       const updateObj = {
-        status: status,
+        status,
       }
       todoItem
         .updateAttributes(updateObj, {
