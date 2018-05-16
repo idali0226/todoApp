@@ -15,29 +15,17 @@ router
 router.route('/search').get((req, res) => {
   const { status, userId } = req.query
 
-  let query
-  if (status && userId) {
-    query = Todo.findAll({
-      where: {
-        status,
-        userId,
-      },
-    })
-  } else if (status) {
-    query = Todo.findAll({
-      where: {
-        status,
-      },
-    })
-  } else {
-    query = Todo.findAll({
-      where: {
-        userId,
-      },
-    })
+  let where = {}
+  if (status) {
+    where = { status }
+  }
+  if (userId) {
+    where = { ...where, userId }
   }
 
-  query.then(todos => res.json(todos))
+  Todo.findAll({
+    where,
+  }).then(todos => res.json(todos))
 })
 
 router
@@ -63,7 +51,7 @@ router
       res.sendStatus(404)
     } else {
       todoItem.destroy()
-      res.sendStatus(200)
+      res.status(200).json(todoItem)
     }
   })
   .put((req, res) => {
@@ -98,7 +86,7 @@ router
         status,
       }
       todoItem
-        .updateAttributes(updateObj, {
+        .update(updateObj, {
           returning: true,
         })
         .then(updatedTodo => {
