@@ -1,9 +1,7 @@
 const express = require('express')
-const bodyParser = require('body-parser')
 const { User, Todo } = require('../sequelize')
 
 const router = express.Router()
-const jsonParser = bodyParser.json()
 
 router
   .route('/')
@@ -17,7 +15,7 @@ router
       ],
     }).then(users => res.json(users))
   })
-  .post(jsonParser, (req, res) => {
+  .post((req, res) => {
     User.create(req.body).then(user => res.json(user))
   })
 

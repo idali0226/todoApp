@@ -1,16 +1,14 @@
 const express = require('express')
-const bodyParser = require('body-parser')
 const { Todo } = require('../sequelize')
 
 const router = express.Router()
-const jsonParser = bodyParser.json()
 
 router
   .route('/')
   .get((req, res) => {
     Todo.findAll().then(todos => res.json(todos))
   })
-  .post(jsonParser, (req, res) => {
+  .post((req, res) => {
     Todo.create(req.body).then(todo => res.json(todo))
   })
 
@@ -68,7 +66,7 @@ router
       res.sendStatus(200)
     }
   })
-  .put(jsonParser, (req, res) => {
+  .put((req, res) => {
     const { name, description, status } = req.body
 
     const todoItem = req.item
@@ -90,7 +88,7 @@ router
         })
     }
   })
-  .patch(jsonParser, (req, res) => {
+  .patch((req, res) => {
     const { status } = req.body
     const todoItem = req.item
     if (!todoItem) {
